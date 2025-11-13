@@ -1,0 +1,8 @@
+{
+  "name": "Aplikasi Pelaporan Relawan",
+  "description": "Aplikasi untuk pelaporan bencana, kegiatan, absensi piket, dan pengelolaan data anggota untuk relawan.",
+  "requestFramePermissions": [
+    "geolocation",
+    "camera"
+  ]
+}
