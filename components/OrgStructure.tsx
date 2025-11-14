@@ -13,6 +13,36 @@ interface Pengurus {
 // Publikasikan sebagai CSV seperti yang Anda lakukan untuk database anggota.
 const PENGURUS_SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7GWOjmvjpe1EqAKtzD8yCadGYpU90oTIIkGSeL0oYriDGCBitjrGpDgrljx8O5LDXgyI4hZu2mmw3/pub?gid=945316663&single=true&output=csv';
 
+// Helper function to parse a single CSV row, handling quoted fields.
+const parseCsvRow = (row: string): string[] => {
+    const result: string[] = [];
+    let currentField = '';
+    let inQuotes = false;
+    for (let i = 0; i < row.length; i++) {
+        const char = row[i];
+        if (char === '"') {
+            if (inQuotes && i + 1 < row.length && row[i + 1] === '"') {
+                // This is an escaped quote, add a single quote to the field
+                currentField += '"';
+                i++; // Skip the next quote
+            } else {
+                // This is a starting or ending quote
+                inQuotes = !inQuotes;
+            }
+        } else if (char === ',' && !inQuotes) {
+            // End of a field
+            result.push(currentField);
+            currentField = '';
+        } else {
+            // Regular character, add to the field
+            currentField += char;
+        }
+    }
+    // Add the last field
+    result.push(currentField);
+    return result;
+};
+
 
 const OrgStructure: React.FC = () => {
     const [pengurusList, setPengurusList] = useState<Pengurus[]>([]);
@@ -37,7 +67,7 @@ const OrgStructure: React.FC = () => {
 
                 for (const row of rows) {
                     if (row.trim() === '') continue;
-                    const columns = row.split(',');
+                    const columns = parseCsvRow(row);
                     if (columns.length >= 3) {
                         parsedPengurus.push({
                             nama: columns[0]?.trim() || '',

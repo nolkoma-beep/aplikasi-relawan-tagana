@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Page } from './types';
 import Navbar from './components/Navbar';
@@ -7,6 +8,8 @@ import ActivityReportForm from './components/ActivityReportForm';
 import AttendanceForm from './components/AttendanceForm';
 import OrgStructure from './components/OrgStructure';
 import MemberDatabase from './components/MemberDatabase';
+import InfoCenter from './components/InfoCenter';
+import EmergencyGuide from './components/EmergencyGuide';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>(Page.HOME);
@@ -21,6 +24,10 @@ const App: React.FC = () => {
         return <ActivityReportForm />;
       case Page.ABSEN_PIKET:
         return <AttendanceForm />;
+      case Page.PENGUMUMAN:
+        return <InfoCenter />;
+      case Page.PANDUAN_DARURAT:
+        return <EmergencyGuide />;
       case Page.SUSUNAN_PENGURUS:
         return <OrgStructure />;
       case Page.DATA_BASE_ANGGOTA:

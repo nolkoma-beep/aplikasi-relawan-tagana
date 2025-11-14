@@ -9,6 +9,8 @@ import UserGroupIcon from './icons/UserGroupIcon';
 import UsersIcon from './icons/UsersIcon';
 import MenuIcon from './icons/MenuIcon';
 import XIcon from './icons/XIcon';
+import InformationCircleIcon from './icons/InformationCircleIcon';
+import ShieldCheckIcon from './icons/ShieldCheckIcon';
 
 interface NavbarProps {
   currentPage: Page;
@@ -20,6 +22,8 @@ const navItems = [
   { page: Page.LAPORAN_BENCANA, label: 'Laporan Bencana', icon: DocumentReportIcon },
   { page: Page.LAPORAN_KEGIATAN, label: 'Laporan Kegiatan', icon: CalendarIcon },
   { page: Page.ABSEN_PIKET, label: 'Absen Piket', icon: ClipboardListIcon },
+  { page: Page.PENGUMUMAN, label: 'Papan Info', icon: InformationCircleIcon },
+  { page: Page.PANDUAN_DARURAT, label: 'Panduan Darurat', icon: ShieldCheckIcon },
   { page: Page.SUSUNAN_PENGURUS, label: 'Susunan Pengurus', icon: UserGroupIcon },
   { page: Page.DATA_BASE_ANGGOTA, label: 'Database Anggota', icon: UsersIcon },
 ];

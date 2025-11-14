@@ -15,6 +15,36 @@ interface Member {
 // Pilih sheet yang relevan, lalu pilih format "Comma-separated values (.csv)", kemudian klik Publikasikan.
 const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7GWOjmvjpe1EqAKtzD8yCadGYpU90oTIIkGSeL0oYriDGCBitjrGpDgrljx8O5LDXgyI4hZu2mmw3/pub?gid=0&single=true&output=csv';
 
+// Helper function to parse a single CSV row, handling quoted fields.
+const parseCsvRow = (row: string): string[] => {
+    const result: string[] = [];
+    let currentField = '';
+    let inQuotes = false;
+    for (let i = 0; i < row.length; i++) {
+        const char = row[i];
+        if (char === '"') {
+            if (inQuotes && i + 1 < row.length && row[i + 1] === '"') {
+                // This is an escaped quote, add a single quote to the field
+                currentField += '"';
+                i++; // Skip the next quote
+            } else {
+                // This is a starting or ending quote
+                inQuotes = !inQuotes;
+            }
+        } else if (char === ',' && !inQuotes) {
+            // End of a field
+            result.push(currentField);
+            currentField = '';
+        } else {
+            // Regular character, add to the field
+            currentField += char;
+        }
+    }
+    // Add the last field
+    result.push(currentField);
+    return result;
+};
+
 const MemberDatabase: React.FC = () => {
     const [members, setMembers] = useState<Member[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -37,7 +67,7 @@ const MemberDatabase: React.FC = () => {
 
                 for (const row of rows) {
                     if (row.trim() === '') continue; // Lewati baris kosong
-                    const columns = row.split(',');
+                    const columns = parseCsvRow(row);
 
                     // Pastikan baris memiliki cukup kolom untuk menghindari error
                     if (columns.length >= 4) {
