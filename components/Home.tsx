@@ -37,7 +37,8 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
   return (
     <div className="text-center">
       <div className="bg-white p-8 rounded-lg shadow-lg mb-8">
-        <h1 className="text-4xl font-extrabold text-gray-800 mb-2">Selamat Datang, Relawan!</h1>
+        <h2 className="text-2xl font-bold text-blue-600 mb-2">TAGANA KAB. SERANG</h2>
+        <h1 className="text-4xl font-extrabold text-gray-800 mb-2">Selamat Datang, Taruna Siaga Bencana!</h1>
         <p className="text-lg text-gray-600">Aplikasi ini didedikasikan untuk memudahkan koordinasi dan pelaporan dalam setiap aksi kemanusiaan.</p>
       </div>
       
