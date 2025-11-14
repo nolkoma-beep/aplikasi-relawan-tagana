@@ -19,13 +19,13 @@ interface NavbarProps {
 
 const navItems = [
   { page: Page.HOME, label: 'Home', icon: HomeIcon },
+  { page: Page.ABSEN_PIKET, label: 'Absen Piket', icon: ClipboardListIcon },
   { page: Page.LAPORAN_BENCANA, label: 'Laporan Bencana', icon: DocumentReportIcon },
   { page: Page.LAPORAN_KEGIATAN, label: 'Laporan Kegiatan', icon: CalendarIcon },
-  { page: Page.ABSEN_PIKET, label: 'Absen Piket', icon: ClipboardListIcon },
-  { page: Page.PENGUMUMAN, label: 'Papan Info', icon: InformationCircleIcon },
-  { page: Page.PANDUAN_DARURAT, label: 'Panduan Darurat', icon: ShieldCheckIcon },
   { page: Page.SUSUNAN_PENGURUS, label: 'Susunan Pengurus', icon: UserGroupIcon },
   { page: Page.DATA_BASE_ANGGOTA, label: 'Database Anggota', icon: UsersIcon },
+  { page: Page.PENGUMUMAN, label: 'Papan Info', icon: InformationCircleIcon },
+  { page: Page.PANDUAN_DARURAT, label: 'Panduan Darurat', icon: ShieldCheckIcon },
 ];
 
 const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) => {
