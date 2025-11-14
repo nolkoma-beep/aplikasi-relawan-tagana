@@ -204,12 +204,14 @@ const AttendanceForm: React.FC = () => {
     
     const renderClockInCard = () => {
         const isFormFilled = nama.trim() !== '' && nia.trim() !== '';
-        // Tombol dinonaktifkan jika form belum diisi atau jika sudah absen (ada submitMessage)
-        const isButtonEnabled = isFormFilled && !submitMessage; 
+        // Tombol dinonaktifkan jika form belum diisi, sudah absen, atau lokasi tidak terdeteksi
+        const isButtonEnabled = isFormFilled && !submitMessage && !!currentCoords; 
         let disabledReason = '';
 
         if (!isFormFilled) {
             disabledReason = 'Isi Nama dan N.I.A terlebih dahulu.';
+        } else if (!currentCoords) {
+            disabledReason = 'Lokasi tidak terdeteksi. Pastikan GPS aktif.';
         } else if (submitMessage) {
             disabledReason = 'Anda sudah absen hari ini.';
         }
@@ -309,7 +311,7 @@ const AttendanceForm: React.FC = () => {
                     </div>
 
                     <div>
-                        <button type="submit" disabled={isSubmitting || !clockInPhoto || !!submitMessage || nama.trim() === '' || nia.trim() === ''} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-300 disabled:cursor-not-allowed">
+                        <button type="submit" disabled={isSubmitting || !clockInPhoto || !!submitMessage || nama.trim() === '' || nia.trim() === '' || !currentCoords} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-300 disabled:cursor-not-allowed">
                             {isSubmitting ? 'Mengirim...' : 'Simpan & Kirim Absensi'}
                         </button>
                     </div>
