@@ -24,10 +24,10 @@ interface AttendanceRecord {
 
 // --- PENGATURAN URL SPREADSHEET ---
 // PENTING: URL ini harus mengarah ke CSV dari Google Sheet Laporan Bencana
-const DISASTER_REPORTS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7GWOjmvjpe1EqAKtzD8yCadGYpU90oTIIkGSeL0oYriDGCBitjrGpDgrljx8O5LDXgyI4hZu2mmw3/pub?gid=1883301017&single=true&output=csv';
+const DISASTER_REPORTS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7GWOjmvjpe1EqAKtzD8yCadGYpU90oTIIkGSeL0oYriDGCBitjrGpDgrljx8O5LDXgyI4hZu2mmw3/pub?gid=1608310799&single=true&output=csv';
 
 // PENTING: URL ini harus mengarah ke CSV dari Google Sheet Absensi Piket
-const ATTENDANCE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7GWOjmvjpe1EqAKtzD8yCadGYpU90oTIIkGSeL0oYriDGCBitjrGpDgrljx8O5LDXgyI4hZu2mmw3/pub?gid=1386561575&single=true&output=csv';
+const ATTENDANCE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7GWOjmvjpe1EqAKtzD8yCadGYpU90oTIIkGSeL0oYriDGCBitjrGpDgrljx8O5LDXgyI4hZu2mmw3/pub?gid=56452246&single=true&output=csv';
 
 // --- FUNGSI BANTUAN PARSE CSV ---
 const parseCsvRow = (row: string): string[] => {

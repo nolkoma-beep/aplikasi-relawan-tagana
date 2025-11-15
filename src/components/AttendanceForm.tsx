@@ -192,6 +192,7 @@ const AttendanceForm: React.FC = () => {
                     clockInPhoto: clockInPhoto!,
                 };
                 localStorage.setItem(storageKey, JSON.stringify(finalData));
+                window.alert("Absensi piket berhasil dicatat dan tersimpan!");
             } else {
                  throw new Error(result.message || 'Terjadi kesalahan pada server.');
             }

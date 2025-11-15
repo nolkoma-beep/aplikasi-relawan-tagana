@@ -20,9 +20,8 @@ interface Pengumuman {
 }
 
 const PENGUMUMAN_SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7GWOjmvjpe1EqAKtzD8yCadGYpU90oTIIkGSeL0oYriDGCBitjrGpDgrljx8O5LDXgyI4hZu2mmw3/pub?gid=222245556&single=true&output=csv';
-const ATTENDANCE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7GWOjmvjpe1EqAKtzD8yCadGYpU90oTIIkGSeL0oYriDGCBitjrGpDgrljx8O5LDXgyI4hZu2mmw3/pub?gid=1386561575&single=true&output=csv';
+const ATTENDANCE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7GWOjmvjpe1EqAKtzD8yCadGYpU90oTIIkGSeL0oYriDGCBitjrGpDgrljx8O5LDXgyI4hZu2mmw3/pub?gid=56452246&single=true&output=csv';
 const DISASTER_REPORT_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7GWOjmvjpe1EqAKtzD8yCadGYpU90oTIIkGSeL0oYriDGCBitjrGpDgrljx8O5LDXgyI4hZu2mmw3/pub?gid=1608310799&single=true&output=csv';
-// PENTING: Ganti gid ini dengan gid dari sheet Laporan Kegiatan Anda
 const ACTIVITY_REPORT_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7GWOjmvjpe1EqAKtzD8yCadGYpU90oTIIkGSeL0oYriDGCBitjrGpDgrljx8O5LDXgyI4hZu2mmw3/pub?gid=798569145&single=true&output=csv';
 
 
@@ -55,6 +54,68 @@ const parseCsvRow = (row: string): string[] => {
     }
     result.push(currentField);
     return result;
+};
+
+// Fungsi parsing tanggal yang lebih canggih dan fleksibel
+const parseDateFromString = (dateString: string): Date | null => {
+    if (!dateString) return null;
+
+    // Attempt 1: Standard new Date() constructor (handles ISO, MM/DD/YYYY)
+    const standardDate = new Date(dateString);
+    if (!isNaN(standardDate.getTime())) {
+        return standardDate;
+    }
+
+    // Attempt 2: Indonesian format ("30 Juli 2024 15:30:00")
+    const monthMap: { [key: string]: number } = {
+        'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5,
+        'juli': 6, 'agustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'desember': 11
+    };
+    const cleanedString = dateString.toLowerCase().replace(/, /g, ' ');
+    const parts = cleanedString.split(' ');
+    
+    const dayPart = parts.find(p => /^\d{1,2}$/.test(p));
+    const monthPart = parts.find(p => monthMap[p] !== undefined);
+    const yearPart = parts.find(p => /^\d{4}$/.test(p));
+
+    if (dayPart && monthPart && yearPart) {
+        const day = parseInt(dayPart, 10);
+        const month = monthMap[monthPart];
+        const year = parseInt(yearPart, 10);
+        const timeMatch = dateString.match(/(\d{2}):(\d{2}):(\d{2})/);
+        const hours = timeMatch ? parseInt(timeMatch[1], 10) : 0;
+        const minutes = timeMatch ? parseInt(timeMatch[2], 10) : 0;
+        const seconds = timeMatch ? parseInt(timeMatch[3], 10) : 0;
+
+        const constructedDate = new Date(year, month, day, hours, minutes, seconds);
+        if (!isNaN(constructedDate.getTime())) {
+            return constructedDate;
+        }
+    }
+
+    // Attempt 3: Common formats like (DD/MM/YYYY or DD-MM-YYYY)
+    const datePartsMatch = dateString.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
+    if (datePartsMatch) {
+        // This regex captures DD, MM, YYYY separated by '/', '-', or '.'
+        const day = parseInt(datePartsMatch[1], 10);
+        const month = parseInt(datePartsMatch[2], 10) - 1; // JS months are 0-indexed
+        const year = parseInt(datePartsMatch[3], 10);
+        
+        const timeMatch = dateString.match(/(\d{2}):(\d{2}):(\d{2})/);
+        const hours = timeMatch ? parseInt(timeMatch[1], 10) : 0;
+        const minutes = timeMatch ? parseInt(timeMatch[2], 10) : 0;
+        const seconds = timeMatch ? parseInt(timeMatch[3], 10) : 0;
+        
+        if (month >= 0 && month < 12 && day > 0 && day <= 31) {
+            const euroDate = new Date(year, month, day, hours, minutes, seconds);
+            if (!isNaN(euroDate.getTime())) {
+                return euroDate;
+            }
+        }
+    }
+    
+    console.warn(`Gagal mem-parsing tanggal: "${dateString}"`);
+    return null;
 };
 
 
@@ -117,10 +178,11 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
             for (const row of rows) {
                 if (row.trim() === '') continue;
                 const columns = parseCsvRow(row);
+                if (!columns || columns.length === 0) continue;
                 const timestamp = columns[0]; // Kolom pertama adalah timestamp
                 if (timestamp) {
-                    const recordDate = new Date(timestamp);
-                    if (!isNaN(recordDate.getTime())) {
+                    const recordDate = parseDateFromString(timestamp);
+                    if (recordDate) {
                         if (recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear) {
                             count++;
                         }
@@ -130,7 +192,7 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
             setMonthlyAttendance(count);
         } catch (error) {
             console.error("Gagal mengambil data absensi:", error);
-            setMonthlyAttendance(null);
+            setMonthlyAttendance(null); // Set ke null jika error
         } finally {
             setIsAttendanceLoading(false);
         }
@@ -150,10 +212,11 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
             for (const row of rows) {
                 if (row.trim() === '') continue;
                 const columns = parseCsvRow(row);
+                if (!columns || columns.length === 0) continue;
                 const timestamp = columns[0]; // Kolom pertama adalah timestamp
                 if (timestamp) {
-                    const recordDate = new Date(timestamp);
-                    if (!isNaN(recordDate.getTime())) {
+                    const recordDate = parseDateFromString(timestamp);
+                    if (recordDate) {
                         if (recordDate.getFullYear() === currentYear) {
                             count++;
                         }
@@ -163,7 +226,7 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
             setYearlyDisasterReports(count);
         } catch (error) {
             console.error("Gagal mengambil data laporan bencana:", error);
-            setYearlyDisasterReports(null);
+            setYearlyDisasterReports(null); // Set ke null jika error
         } finally {
             setIsDisasterLoading(false);
         }
@@ -183,10 +246,11 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
             for (const row of rows) {
                 if (row.trim() === '') continue;
                 const columns = parseCsvRow(row);
+                if (!columns || columns.length === 0) continue;
                 const timestamp = columns[0]; // Kolom pertama adalah timestamp
                 if (timestamp) {
-                    const recordDate = new Date(timestamp);
-                    if (!isNaN(recordDate.getTime())) {
+                    const recordDate = parseDateFromString(timestamp);
+                    if (recordDate) {
                         if (recordDate.getFullYear() === currentYear) {
                             count++;
                         }
@@ -196,7 +260,7 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
             setYearlyActivityReports(count);
         } catch (error) {
             console.error("Gagal mengambil data laporan kegiatan:", error);
-            setYearlyActivityReports(null);
+            setYearlyActivityReports(null); // Set ke null jika error
         } finally {
             setIsActivityLoading(false);
         }
@@ -251,7 +315,7 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
       return (
           <>
               <div className="flex items-center mb-4">
-                  <Icon className={`w-6 h-6 ${colorClasses.text} mr-3`} />
+                  <Icon className={`w-6 h-6 ${colorClasses.text} dark:${colorClasses.darkText} mr-3`} />
                   <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">{title}</h2>
               </div>
               {isLoading ? (
@@ -263,15 +327,16 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
                   </div>
               ) : (
                   <div className="text-center text-red-500 dark:text-red-400">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                       </svg>
-                      <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">Gagal Memuat Data</p>
+                      <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm font-semibold">Gagal Memuat Data</p>
                   </div>
               )}
           </>
       );
   };
+
 
   return (
     <div className="space-y-8">
@@ -314,13 +379,13 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
       {/* Rekap Data */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-          {renderStatCard(isAttendanceLoading, monthlyAttendance, 'Piket Bulan Ini', UsersIcon, { text: 'text-teal-500', darkText: 'dark:text-teal-400' })}
+          {renderStatCard(isAttendanceLoading, monthlyAttendance, 'Piket Bulan Ini', UsersIcon, { text: 'text-teal-600', darkText: 'dark:text-teal-400' })}
         </div>
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-          {renderStatCard(isDisasterLoading, yearlyDisasterReports, 'Bencana Tahun Ini', DocumentReportIcon, { text: 'text-red-500', darkText: 'dark:text-red-400' })}
+          {renderStatCard(isDisasterLoading, yearlyDisasterReports, 'Bencana Tahun Ini', DocumentReportIcon, { text: 'text-red-600', darkText: 'dark:text-red-400' })}
         </div>
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-          {renderStatCard(isActivityLoading, yearlyActivityReports, 'Kegiatan Tahun Ini', CalendarIcon, { text: 'text-blue-500', darkText: 'dark:text-blue-400' })}
+          {renderStatCard(isActivityLoading, yearlyActivityReports, 'Kegiatan Tahun Ini', CalendarIcon, { text: 'text-blue-600', darkText: 'dark:text-blue-400' })}
         </div>
       </div>
       
