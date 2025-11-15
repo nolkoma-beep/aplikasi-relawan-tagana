@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import CameraIcon from './icons/CameraIcon';
 import DocumentReportIcon from './icons/DocumentReportIcon';
@@ -34,12 +35,9 @@ const DisasterReportForm: React.FC = () => {
         setIsSubmitting(true);
         setSubmitMessage(null);
 
-        // FIX: Removed unreachable code that checks for a placeholder URL.
-        // The APPS_SCRIPT_URL constant is already defined with a valid URL,
-        // so the check against a placeholder string was causing a compile-time error.
         const form = e.currentTarget;
         const formData = new FormData(form);
-
+        
         imagePreviews.forEach((img, index) => {
             if (img) {
                 formData.append(`foto${index + 1}`, img);
@@ -78,13 +76,13 @@ const DisasterReportForm: React.FC = () => {
     const renderImageUploader = (index: number) => {
         const isRequired = index === 0;
         return (
-            <div className="border-2 border-gray-300 border-dashed rounded-md p-4 text-center h-full flex flex-col justify-center items-center">
+            <div className="border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md p-4 text-center h-full flex flex-col justify-center items-center">
                 {imagePreviews[index] ? (
                     <img src={imagePreviews[index]} alt={`Preview ${index + 1}`} className="mx-auto h-24 w-auto rounded-md object-cover mb-2" />
                 ) : (
-                    <CameraIcon className="mx-auto h-12 w-12 text-gray-400" />
+                    <CameraIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
                 )}
-                <label htmlFor={`file-upload-${index}`} className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 text-sm mt-2 block">
+                <label htmlFor={`file-upload-${index}`} className="relative cursor-pointer bg-white dark:bg-gray-700 rounded-md font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 text-sm mt-2 block px-2 py-1">
                     <span>Unggah Foto {index + 1} {isRequired && '(Wajib)'}</span>
                     <input 
                         id={`file-upload-${index}`} 
@@ -99,67 +97,68 @@ const DisasterReportForm: React.FC = () => {
             </div>
         );
     }
+    const isSubmitDisabled = isSubmitting;
 
     return (
-        <div className="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+        <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
             <div className="flex items-center justify-center mb-6">
-                 <div className="bg-red-100 p-3 rounded-full">
-                    <DocumentReportIcon className="w-8 h-8 text-red-600" />
+                 <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-full">
+                    <DocumentReportIcon className="w-8 h-8 text-red-600 dark:text-red-400" />
                 </div>
             </div>
-            <h2 className="text-2xl font-bold text-center text-gray-800 mb-1">Laporan Bencana</h2>
-            <p className="text-center text-gray-500 mb-8">Isi formulir di bawah ini untuk melaporkan kejadian bencana.</p>
+            <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-1">Laporan Bencana</h2>
+            <p className="text-center text-gray-500 dark:text-gray-400 mb-8">Isi formulir di bawah ini untuk melaporkan kejadian bencana.</p>
             
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-                    <input type="text" id="fullName" name="fullName" required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Lengkap</label>
+                    <input type="text" id="fullName" name="fullName" required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:text-white dark:placeholder-gray-400" />
                 </div>
                 <div>
-                    <label htmlFor="nia" className="block text-sm font-medium text-gray-700">Nomor Induk Anggota</label>
-                    <input type="text" id="nia" name="nia" required placeholder="Masukkan N.I.A Anda" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                    <label htmlFor="nia" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nomor Induk Anggota</label>
+                    <input type="text" id="nia" name="nia" required placeholder="Masukkan N.I.A Anda" className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:text-white dark:placeholder-gray-400" />
                 </div>
                 <div>
-                    <label htmlFor="disasterType" className="block text-sm font-medium text-gray-700">Jenis Bencana</label>
-                    <select id="disasterType" name="disasterType" required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <label htmlFor="disasterType" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Jenis Bencana</label>
+                    <select id="disasterType" name="disasterType" required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:text-white">
                         <option value="">Pilih jenis bencana</option>
                         {disasterTypes.map(type => <option key={type} value={type}>{type}</option>)}
                     </select>
                 </div>
                 <div>
-                    <label htmlFor="disasterTime" className="block text-sm font-medium text-gray-700">Waktu Bencana</label>
-                    <input type="datetime-local" id="disasterTime" name="disasterTime" required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                    <label htmlFor="disasterTime" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Waktu Bencana</label>
+                    <input type="datetime-local" id="disasterTime" name="disasterTime" required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:text-white" />
                 </div>
                 <div>
-                    <label htmlFor="disasterLocation" className="block text-sm font-medium text-gray-700">Tempat Bencana</label>
-                    <input type="text" id="disasterLocation" name="disasterLocation" required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                    <label htmlFor="disasterLocation" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tempat Bencana</label>
+                    <input type="text" id="disasterLocation" name="disasterLocation" required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:text-white dark:placeholder-gray-400" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                        <label htmlFor="affectedHouseholds" className="block text-sm font-medium text-gray-700">Jumlah KK Terdampak</label>
-                        <input type="number" id="affectedHouseholds" name="affectedHouseholds" min="0" required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                        <label htmlFor="affectedHouseholds" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Jumlah KK Terdampak</label>
+                        <input type="number" id="affectedHouseholds" name="affectedHouseholds" min="0" required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:text-white dark:placeholder-gray-400" />
                     </div>
                     <div>
-                        <label htmlFor="affectedPeople" className="block text-sm font-medium text-gray-700">Jumlah Jiwa Terdampak</label>
-                        <input type="number" id="affectedPeople" name="affectedPeople" min="0" required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                        <label htmlFor="affectedPeople" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Jumlah Jiwa Terdampak</label>
+                        <input type="number" id="affectedPeople" name="affectedPeople" min="0" required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:text-white dark:placeholder-gray-400" />
                     </div>
                 </div>
                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Dokumentasi</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Dokumentasi</label>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         {renderImageUploader(0)}
                         {renderImageUploader(1)}
                         {renderImageUploader(2)}
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">PNG, JPG, GIF hingga 10MB.</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">PNG, JPG, GIF hingga 10MB.</p>
                 </div>
                 <div>
-                    <button type="submit" disabled={isSubmitting} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-red-300">
+                    <button type="submit" disabled={isSubmitDisabled} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-red-400 dark:disabled:bg-red-800 disabled:cursor-not-allowed">
                         {isSubmitting ? 'Mengirim...' : 'Kirim Laporan'}
                     </button>
                 </div>
                 {submitMessage && (
-                    <p className={`text-center font-medium ${submitMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                    <p className={`text-center font-medium ${submitMessage.type === 'success' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                         {submitMessage.text}
                     </p>
                 )}

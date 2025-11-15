@@ -91,31 +91,31 @@ const InfoCenter: React.FC = () => {
     const getCategoryClass = (kategori: string) => {
         switch (kategori.toUpperCase()) {
             case 'PENTING':
-                return 'bg-red-100 text-red-800';
+                return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300';
             case 'JADWAL':
-                return 'bg-blue-100 text-blue-800';
+                return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300';
             case 'INFO':
             default:
-                return 'bg-green-100 text-green-800';
+                return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300';
         }
     };
 
     return (
         <div className="max-w-4xl mx-auto">
-            <div className="bg-white p-8 rounded-xl shadow-lg mb-8 text-center">
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg mb-8 text-center">
                 <div className="flex items-center justify-center mb-4">
-                    <div className="bg-yellow-100 p-3 rounded-full">
-                        <InformationCircleIcon className="w-8 h-8 text-yellow-600" />
+                    <div className="bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded-full">
+                        <InformationCircleIcon className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
                     </div>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800">Papan Informasi</h2>
-                <p className="text-gray-500 mt-2">Pengumuman, jadwal, dan informasi penting lainnya.</p>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Papan Informasi</h2>
+                <p className="text-gray-500 dark:text-gray-400 mt-2">Pengumuman, jadwal, dan informasi penting lainnya.</p>
             </div>
 
-            {isLoading && <p className="text-center text-gray-600">Memuat pengumuman...</p>}
+            {isLoading && <p className="text-center text-gray-600 dark:text-gray-400">Memuat pengumuman...</p>}
 
             {error && (
-                <div className="text-center bg-red-100 text-red-700 p-4 rounded-lg">
+                <div className="text-center bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 p-4 rounded-lg">
                     <p className="font-bold">Terjadi Kesalahan</p>
                     <p>{error}</p>
                     <p className="mt-2 text-sm">Menampilkan data contoh.</p>
@@ -126,22 +126,22 @@ const InfoCenter: React.FC = () => {
                 <div className="space-y-6">
                     {pengumumanList.length > 0 ? (
                         pengumumanList.map((item, index) => (
-                            <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden transition-shadow duration-300 hover:shadow-xl">
+                            <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow duration-300 hover:shadow-xl">
                                 <div className="p-5">
                                     <div className="flex justify-between items-start mb-2">
                                         <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${getCategoryClass(item.kategori)}`}>
                                             {item.kategori}
                                         </span>
-                                        <p className="text-sm text-gray-500">{item.tanggal}</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">{item.tanggal}</p>
                                     </div>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-2">{item.judul}</h3>
-                                    <p className="text-gray-700 whitespace-pre-wrap">{item.isi}</p>
+                                    <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">{item.judul}</h3>
+                                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{item.isi}</p>
                                 </div>
                             </div>
                         ))
                     ) : (
                         <div className="text-center py-12">
-                            <p className="text-xl text-gray-500">Belum ada pengumuman.</p>
+                            <p className="text-xl text-gray-500 dark:text-gray-400">Belum ada pengumuman.</p>
                         </div>
                     )}
                 </div>

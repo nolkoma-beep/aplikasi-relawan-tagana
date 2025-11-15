@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Page } from './types';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
@@ -11,8 +11,34 @@ import MemberDatabase from './components/MemberDatabase';
 import InfoCenter from './components/InfoCenter';
 import EmergencyGuide from './components/EmergencyGuide';
 
+type Theme = 'light' | 'dark';
+
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>(Page.HOME);
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const storedPrefs = window.localStorage.getItem('theme');
+      if (storedPrefs === 'light' || storedPrefs === 'dark') {
+        return storedPrefs;
+      }
+      const userMedia = window.matchMedia('(prefers-color-scheme: dark)');
+      if (userMedia.matches) {
+        return 'dark';
+      }
+    }
+    return 'light';
+  });
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
 
   const renderPage = () => {
     switch (currentPage) {
@@ -38,8 +64,8 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-800 font-sans">
-      <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-300">
+      <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} theme={theme} setTheme={setTheme} />
       <main className="p-4 sm:p-6 lg:p-8 pt-20 sm:pt-24">
         {renderPage()}
       </main>

@@ -110,14 +110,14 @@ const MemberDatabase: React.FC = () => {
 
     return (
         <div className="max-w-7xl mx-auto">
-            <div className="bg-white p-8 rounded-xl shadow-lg mb-8">
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg mb-8">
                 <div className="flex items-center justify-center mb-4">
-                    <div className="bg-purple-100 p-3 rounded-full">
-                        <UsersIcon className="w-8 h-8 text-purple-600" />
+                    <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full">
+                        <UsersIcon className="w-8 h-8 text-purple-600 dark:text-purple-400" />
                     </div>
                 </div>
-                <h2 className="text-2xl font-bold text-center text-gray-800">DATABASE ANGGOTA</h2>
-                <p className="text-center text-gray-500 mt-2">TAGANA KABUPATEN SERANG</p>
+                <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100">DATABASE ANGGOTA</h2>
+                <p className="text-center text-gray-500 dark:text-gray-400 mt-2">TAGANA KABUPATEN SERANG</p>
                  <div className="mt-6 max-w-lg mx-auto">
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -128,7 +128,7 @@ const MemberDatabase: React.FC = () => {
                             placeholder="Cari anggota (nama, kecamatan, NIAT)..."
                             value={searchTerm}
                             onChange={handleSearchChange}
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
                     </div>
                 </div>
@@ -136,12 +136,12 @@ const MemberDatabase: React.FC = () => {
 
             {isLoading && (
                 <div className="text-center py-10">
-                    <p className="text-lg text-gray-600">Memuat data anggota...</p>
+                    <p className="text-lg text-gray-600 dark:text-gray-400">Memuat data anggota...</p>
                 </div>
             )}
 
             {error && (
-                <div className="text-center py-10 bg-red-100 text-red-700 p-4 rounded-lg">
+                <div className="text-center py-10 bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 p-4 rounded-lg">
                     <p className="font-bold">Terjadi Kesalahan</p>
                     <p>{error}</p>
                     <p className="mt-2 text-sm">Menampilkan data contoh.</p>
@@ -152,18 +152,18 @@ const MemberDatabase: React.FC = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {filteredMembers.length > 0 ? (
                         filteredMembers.map((member, index) => (
-                            <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden text-center transform hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
-                                <img src={member.foto} alt={member.nama} className="w-full aspect-square object-cover bg-gray-200" onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/200'; }}/>
+                            <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden text-center transform hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
+                                <img src={member.foto} alt={member.nama} className="w-full aspect-square object-cover bg-gray-200 dark:bg-gray-700" onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/200'; }}/>
                                 <div className="p-3">
-                                    <h3 className="text-base font-bold text-gray-900 truncate">{member.nama}</h3>
-                                    <p className="text-blue-600 font-semibold text-xs">{member.kecamatan}</p>
-                                    <p className="text-xs text-gray-500 mt-1">NIAT: {member.niat}</p>
+                                    <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 truncate">{member.nama}</h3>
+                                    <p className="text-blue-600 dark:text-blue-400 font-semibold text-xs">{member.kecamatan}</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">NIAT: {member.niat}</p>
                                 </div>
                             </div>
                         ))
                     ) : (
                         <div className="col-span-full text-center py-12">
-                            <p className="text-xl text-gray-500">Anggota tidak ditemukan.</p>
+                            <p className="text-xl text-gray-500 dark:text-gray-400">Anggota tidak ditemukan.</p>
                         </div>
                     )}
                 </div>

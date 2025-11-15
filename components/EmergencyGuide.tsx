@@ -44,24 +44,24 @@ const sopGuides = [
 const EmergencyGuide: React.FC = () => {
     return (
         <div className="max-w-4xl mx-auto">
-            <div className="bg-white p-8 rounded-xl shadow-lg mb-8 text-center">
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg mb-8 text-center">
                  <div className="flex items-center justify-center mb-4">
-                    <div className="bg-cyan-100 p-3 rounded-full">
-                        <ShieldCheckIcon className="w-8 h-8 text-cyan-600" />
+                    <div className="bg-cyan-100 dark:bg-cyan-900/30 p-3 rounded-full">
+                        <ShieldCheckIcon className="w-8 h-8 text-cyan-600 dark:text-cyan-400" />
                     </div>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800">Panduan & Kontak Darurat</h2>
-                <p className="text-gray-500 mt-2">Informasi penting untuk kesiapsiagaan bencana.</p>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Panduan & Kontak Darurat</h2>
+                <p className="text-gray-500 dark:text-gray-400 mt-2">Informasi penting untuk kesiapsiagaan bencana.</p>
             </div>
 
             {/* Kontak Penting */}
-            <div className="bg-white p-6 rounded-xl shadow-lg mb-8">
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Kontak Penting</h3>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
+                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Kontak Penting</h3>
                 <ul className="space-y-3">
                     {emergencyContacts.map(contact => (
-                         <li key={contact.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <span className="font-medium text-gray-700">{contact.name}</span>
-                            <a href={`tel:${contact.number.replace(/-/g, '')}`} className="flex items-center text-blue-600 font-semibold text-sm hover:text-blue-800 transition-colors">
+                         <li key={contact.name} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                            <span className="font-medium text-gray-700 dark:text-gray-300">{contact.name}</span>
+                            <a href={`tel:${contact.number.replace(/-/g, '')}`} className="flex items-center text-blue-600 dark:text-blue-400 font-semibold text-sm hover:text-blue-800 dark:hover:text-blue-300 transition-colors">
                                 <PhoneIcon className="w-4 h-4 mr-2" />
                                 {contact.number}
                             </a>
@@ -71,18 +71,18 @@ const EmergencyGuide: React.FC = () => {
             </div>
 
             {/* Panduan Singkat (SOP) */}
-            <div className="bg-white p-6 rounded-xl shadow-lg">
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Panduan Singkat (SOP)</h3>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Panduan Singkat (SOP)</h3>
                 <div className="space-y-3">
                     {sopGuides.map(guide => (
-                        <details key={guide.title} className="group bg-gray-50 rounded-lg p-3 cursor-pointer">
-                            <summary className="font-bold text-gray-700 list-none flex justify-between items-center">
+                        <details key={guide.title} className="group bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 cursor-pointer">
+                            <summary className="font-bold text-gray-700 dark:text-gray-300 list-none flex justify-between items-center">
                                 {guide.title}
                                 <span className="transform transition-transform duration-200 group-open:rotate-180">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                                 </span>
                             </summary>
-                            <ul className="mt-3 pl-5 list-disc space-y-1 text-gray-600">
+                            <ul className="mt-3 pl-5 list-disc space-y-1 text-gray-600 dark:text-gray-400">
                                 {guide.steps.map((step, index) => <li key={index}>{step}</li>)}
                             </ul>
                         </details>

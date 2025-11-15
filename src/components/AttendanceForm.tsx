@@ -217,19 +217,19 @@ const AttendanceForm: React.FC = () => {
         }
 
         return (
-             <div className="border border-gray-200 rounded-lg p-4 flex flex-col">
-                <h3 className="font-bold text-lg text-gray-700">Absen Datang</h3>
+             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex flex-col">
+                <h3 className="font-bold text-lg text-gray-700 dark:text-gray-300">Absen Datang</h3>
                 {clockInTime && clockInPhoto ? (
                      <div className="mt-4 space-y-2">
                         <img src={clockInPhoto} alt="Foto Absen Datang" className="w-full h-auto rounded-md object-cover" />
-                        <p className="text-sm text-gray-600">Waktu: <span className="font-medium">{clockInTime.toLocaleTimeString('id-ID')}</span></p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Waktu: <span className="font-medium">{clockInTime.toLocaleTimeString('id-ID')}</span></p>
                     </div>
                 ) : (
-                    <div className="mt-4 flex flex-col items-center justify-center h-full flex-grow bg-gray-50 rounded-md p-4 text-center">
-                        <CameraIcon className="w-12 h-12 text-gray-400 mb-2"/>
+                    <div className="mt-4 flex flex-col items-center justify-center h-full flex-grow bg-gray-50 dark:bg-gray-700/50 rounded-md p-4 text-center">
+                        <CameraIcon className="w-12 h-12 text-gray-400 dark:text-gray-500 mb-2"/>
                         <label 
                             htmlFor="clock-in-file-upload"
-                            className={`mt-2 inline-block px-4 py-2 text-white rounded-md shadow-sm ${!isButtonEnabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'}`}
+                            className={`mt-2 inline-block px-4 py-2 text-white rounded-md shadow-sm ${!isButtonEnabled ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'}`}
                             aria-disabled={!isButtonEnabled}
                         >
                             Ambil Foto & Absen
@@ -246,7 +246,7 @@ const AttendanceForm: React.FC = () => {
                          {!isButtonEnabled && (
                             <p 
                               id="clock-in-reason"
-                              className="text-xs mt-2 text-gray-500"
+                              className="text-xs mt-2 text-gray-500 dark:text-gray-400"
                             >
                                 {disabledReason}
                             </p>
@@ -261,9 +261,9 @@ const AttendanceForm: React.FC = () => {
         <>
             {isConfirmDialogOpen && (
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-75 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-                        <h3 className="text-xl font-bold mb-4">Konfirmasi Absensi</h3>
-                        <div className="space-y-2 text-sm">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
+                        <h3 className="text-xl font-bold mb-4 dark:text-gray-100">Konfirmasi Absensi</h3>
+                        <div className="space-y-2 text-sm dark:text-gray-300">
                             <p><strong>Nama:</strong> {nama}</p>
                             <p><strong>N.I.A:</strong> {nia}</p>
                             {currentCoords && <p><strong>Lokasi:</strong> {`${currentCoords.latitude.toFixed(5)}, ${currentCoords.longitude.toFixed(5)}`}</p>}
@@ -273,8 +273,8 @@ const AttendanceForm: React.FC = () => {
                             {clockInPhoto && <img src={clockInPhoto} alt="Foto Datang" className="w-24 h-24 rounded-md object-cover"/>}
                         </div>
                         <div className="mt-6 flex justify-end space-x-3">
-                            <button onClick={() => setIsConfirmDialogOpen(false)} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</button>
-                            <button onClick={handleConfirmSubmit} disabled={isSubmitting} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-300">
+                            <button onClick={() => setIsConfirmDialogOpen(false)} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Batal</button>
+                            <button onClick={handleConfirmSubmit} disabled={isSubmitting} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-400 dark:disabled:bg-green-800">
                                 {isSubmitting ? 'Menyimpan...' : 'Ya, Simpan'}
                             </button>
                         </div>
@@ -282,26 +282,26 @@ const AttendanceForm: React.FC = () => {
                 </div>
             )}
 
-            <div className="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+            <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
                 <div className="flex items-center justify-center mb-6">
-                    <div className="bg-green-100 p-3 rounded-full">
-                        <ClipboardListIcon className="w-8 h-8 text-green-600" />
+                    <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-full">
+                        <ClipboardListIcon className="w-8 h-8 text-green-600 dark:text-green-400" />
                     </div>
                 </div>
-                <h2 className="text-2xl font-bold text-center text-gray-800 mb-1">Absensi Piket</h2>
-                <p className="text-center text-gray-500 mb-8">Lokasi Anda akan dicatat saat melakukan absensi.</p>
+                <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-1">Absensi Piket</h2>
+                <p className="text-center text-gray-500 dark:text-gray-400 mb-8">Lokasi Anda akan dicatat saat melakukan absensi.</p>
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-                        <input type="text" id="fullName" name="fullName" value={nama} onChange={(e) => setNama(e.target.value)} required readOnly={!!clockInTime} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 read-only:bg-gray-100 read-only:cursor-not-allowed" />
+                        <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Lengkap</label>
+                        <input type="text" id="fullName" name="fullName" value={nama} onChange={(e) => setNama(e.target.value)} required readOnly={!!clockInTime} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 read-only:bg-gray-100 dark:read-only:bg-gray-600 read-only:cursor-not-allowed dark:text-white" />
                     </div>
                     <div>
-                        <label htmlFor="nia" className="block text-sm font-medium text-gray-700">Nomor Induk Anggota</label>
-                        <input type="text" id="nia" name="nia" value={nia} onChange={(e) => setNia(e.target.value)} required readOnly={!!clockInTime} placeholder="Masukkan N.I.A Anda" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 read-only:bg-gray-100 read-only:cursor-not-allowed" />
+                        <label htmlFor="nia" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nomor Induk Anggota</label>
+                        <input type="text" id="nia" name="nia" value={nia} onChange={(e) => setNia(e.target.value)} required readOnly={!!clockInTime} placeholder="Masukkan N.I.A Anda" className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 read-only:bg-gray-100 dark:read-only:bg-gray-600 read-only:cursor-not-allowed dark:text-white dark:placeholder-gray-400" />
                     </div>
                     
-                    <div className="flex items-center text-sm p-3 rounded-md transition-colors duration-300 bg-blue-100 text-blue-800">
+                    <div className="flex items-center text-sm p-3 rounded-md transition-colors duration-300 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300">
                         <MapPinIcon className="w-5 h-5 mr-2 flex-shrink-0" />
                         <span className="font-medium">{locationStatus}</span>
                     </div>
@@ -311,12 +311,12 @@ const AttendanceForm: React.FC = () => {
                     </div>
 
                     <div>
-                        <button type="submit" disabled={isSubmitting || !clockInPhoto || !!submitMessage || nama.trim() === '' || nia.trim() === '' || !currentCoords} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-300 disabled:cursor-not-allowed">
+                        <button type="submit" disabled={isSubmitting || !clockInPhoto || !!submitMessage || nama.trim() === '' || nia.trim() === '' || !currentCoords} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-400 dark:disabled:bg-green-800 disabled:cursor-not-allowed">
                             {isSubmitting ? 'Mengirim...' : 'Simpan & Kirim Absensi'}
                         </button>
                     </div>
                     {submitMessage && (
-                        <div className={`text-center p-4 rounded-md ${submitMessage.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        <div className={`text-center p-4 rounded-md ${submitMessage.type === 'success' ? 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300'}`}>
                             <p className="font-medium">{submitMessage.text}</p>
                             {submitMessage.type === 'success' && <p className="text-sm mt-1">Anda sudah tercatat absen hari ini. Terima kasih!</p>}
                         </div>
