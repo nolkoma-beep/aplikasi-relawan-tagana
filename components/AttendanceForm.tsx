@@ -6,7 +6,29 @@ import MapPinIcon from './icons/MapPinIcon';
 // --- PENGATURAN SPREADSHEET ---
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzkeEzeP0m6kbcFKFqyNGaVmV1LBDUV8Xraiw5NksZw4IUmXFod9e3QwAEz_nkjVzt_Vg/exec'; 
 
+// --- PENGATURAN LOKASI ---
+// GANTI DENGAN KOORDINAT MARKAS/POSKO ANDA
+const MARKAS_COORDS = { latitude: -6.152835, longitude: 106.178555 }; 
+// Jarak maksimal dalam meter untuk bisa absen
+const MAX_DISTANCE_METERS = 100; 
+
 // --- FUNGSI BANTUAN ---
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371e3; // meter
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // dalam meter
+};
+
+
 const getTodaysStorageKey = () => {
     const today = new Date();
     return `attendanceData-${today.toISOString().split('T')[0]}`;
@@ -32,6 +54,8 @@ const AttendanceForm: React.FC = () => {
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [locationStatus, setLocationStatus] = useState('Mencari lokasi...');
     const [currentCoords, setCurrentCoords] = useState<{ latitude: number, longitude: number } | null>(null);
+    const [distanceFromCenter, setDistanceFromCenter] = useState<number | null>(null);
+    const [isWithinRange, setIsWithinRange] = useState(false);
 
     const locationWatchIdRef = useRef<number | null>(null);
     const storageKey = getTodaysStorageKey();
@@ -87,10 +111,20 @@ const AttendanceForm: React.FC = () => {
                 (position) => {
                     const { latitude, longitude } = position.coords;
                     setCurrentCoords({ latitude, longitude });
-                    setLocationStatus('Lokasi terdeteksi dan akan dicatat.');
+                    const distance = calculateDistance(latitude, longitude, MARKAS_COORDS.latitude, MARKAS_COORDS.longitude);
+                    setDistanceFromCenter(distance);
+                    
+                    if (distance <= MAX_DISTANCE_METERS) {
+                        setIsWithinRange(true);
+                        setLocationStatus(`Lokasi terdeteksi. Jarak dari markas: ${distance.toFixed(0)} meter.`);
+                    } else {
+                        setIsWithinRange(false);
+                        setLocationStatus(`Anda terlalu jauh dari markas (${distance.toFixed(0)} meter). Mendekatlah untuk absen.`);
+                    }
                 },
                 () => {
-                    setLocationStatus('Gagal mendapatkan lokasi. Pastikan GPS aktif.');
+                    setLocationStatus('Gagal mendapatkan lokasi. Pastikan GPS & izin lokasi aktif.');
+                    setIsWithinRange(false);
                 }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
         } else {
@@ -205,14 +239,16 @@ const AttendanceForm: React.FC = () => {
     
     const renderClockInCard = () => {
         const isFormFilled = nama.trim() !== '' && nia.trim() !== '';
-        // Tombol dinonaktifkan jika form belum diisi, sudah absen, atau lokasi tidak terdeteksi
-        const isButtonEnabled = isFormFilled && !submitMessage && !!currentCoords; 
+        // Tombol dinonaktifkan jika form belum diisi, sudah absen, atau di luar jangkauan
+        const isButtonEnabled = isFormFilled && !submitMessage && isWithinRange; 
         let disabledReason = '';
 
         if (!isFormFilled) {
             disabledReason = 'Isi Nama dan N.I.A terlebih dahulu.';
         } else if (!currentCoords) {
             disabledReason = 'Lokasi tidak terdeteksi. Pastikan GPS aktif.';
+        } else if (!isWithinRange) {
+             disabledReason = `Anda terlalu jauh dari markas (${distanceFromCenter?.toFixed(0)} meter).`;
         } else if (submitMessage) {
             disabledReason = 'Anda sudah absen hari ini.';
         }
@@ -268,6 +304,7 @@ const AttendanceForm: React.FC = () => {
                             <p><strong>Nama:</strong> {nama}</p>
                             <p><strong>N.I.A:</strong> {nia}</p>
                             {currentCoords && <p><strong>Lokasi:</strong> {`${currentCoords.latitude.toFixed(5)}, ${currentCoords.longitude.toFixed(5)}`}</p>}
+                            {distanceFromCenter !== null && <p><strong>Jarak dari Markas:</strong> {distanceFromCenter.toFixed(0)} meter</p>}
                             {clockInTime && <p><strong>Waktu Datang:</strong> {clockInTime.toLocaleString('id-ID')}</p>}
                         </div>
                         <div className="flex justify-center gap-4 mt-6">
@@ -290,7 +327,7 @@ const AttendanceForm: React.FC = () => {
                     </div>
                 </div>
                 <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-1">Absensi Piket</h2>
-                <p className="text-center text-gray-500 dark:text-gray-400 mb-8">Lokasi Anda akan dicatat saat melakukan absensi.</p>
+                <p className="text-center text-gray-500 dark:text-gray-400 mb-8">Anda harus berada dalam radius {MAX_DISTANCE_METERS} meter dari markas untuk absen.</p>
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
@@ -302,7 +339,7 @@ const AttendanceForm: React.FC = () => {
                         <input type="text" id="nia" name="nia" value={nia} onChange={(e) => setNia(e.target.value)} required readOnly={!!clockInTime} placeholder="Masukkan N.I.A Anda" className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 read-only:bg-gray-100 dark:read-only:bg-gray-600 read-only:cursor-not-allowed dark:text-white dark:placeholder-gray-400" />
                     </div>
                     
-                    <div className="flex items-center text-sm p-3 rounded-md transition-colors duration-300 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300">
+                    <div className={`flex items-center text-sm p-3 rounded-md transition-colors duration-300 ${isWithinRange ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300' : 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300'}`}>
                         <MapPinIcon className="w-5 h-5 mr-2 flex-shrink-0" />
                         <span className="font-medium">{locationStatus}</span>
                     </div>
@@ -312,7 +349,7 @@ const AttendanceForm: React.FC = () => {
                     </div>
 
                     <div>
-                        <button type="submit" disabled={isSubmitting || !clockInPhoto || !!submitMessage || nama.trim() === '' || nia.trim() === '' || !currentCoords} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-400 dark:disabled:bg-green-800 disabled:cursor-not-allowed">
+                        <button type="submit" disabled={isSubmitting || !clockInPhoto || !!submitMessage || !isWithinRange} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-400 dark:disabled:bg-green-800 disabled:cursor-not-allowed">
                             {isSubmitting ? 'Mengirim...' : 'Simpan & Kirim Absensi'}
                         </button>
                     </div>
