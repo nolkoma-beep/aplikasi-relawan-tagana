@@ -68,7 +68,7 @@ const DisasterReportForm: React.FC = () => {
     };
 
     const disasterTypes = [
-        "Puting Beliung", "Rumah Roboh", "Banjir", "Kebakaran", "Longsor",
+        "Puting Beliung", "Rumah Roboh", "Pohon Tumbang", "Banjir", "Kebakaran", "Longsor",
         "Hanyut Tenggelam", "Kecelakaan", "Tersambar Petir",
         "Konflik Sosial", "Penyakit Luar Biasa", "Lainnya..."
     ];
