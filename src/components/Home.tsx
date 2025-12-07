@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Page } from '../types';
 import DocumentReportIcon from './icons/DocumentReportIcon';
@@ -60,60 +61,88 @@ const parseCsvRow = (row: string): string[] => {
 const parseDateFromString = (dateString: string): Date | null => {
     if (!dateString) return null;
 
-    // Attempt 1: Standard new Date() constructor (handles ISO, MM/DD/YYYY)
-    const standardDate = new Date(dateString);
-    if (!isNaN(standardDate.getTime())) {
+    const cleanedString = dateString.trim();
+
+    // Attempt 1: Standard new Date() constructor (handles ISO like YYYY-MM-DD)
+    const standardDate = new Date(cleanedString);
+    if (!isNaN(standardDate.getTime()) && cleanedString.includes('-')) {
         return standardDate;
     }
 
-    // Attempt 2: Indonesian format ("30 Juli 2024 15:30:00")
-    const monthMap: { [key: string]: number } = {
-        'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5,
-        'juli': 6, 'agustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'desember': 11
-    };
-    const cleanedString = dateString.toLowerCase().replace(/, /g, ' ');
-    const parts = cleanedString.split(' ');
+    // Attempt 2: Handle formats like DD/MM/YYYY or MM/DD/YYYY
+    // Split by slash, dash, dot, or space
+    const parts = cleanedString.split(/[\/\-\.\s]+/);
     
-    const dayPart = parts.find(p => /^\d{1,2}$/.test(p));
-    const monthPart = parts.find(p => monthMap[p] !== undefined);
-    const yearPart = parts.find(p => /^\d{4}$/.test(p));
+    // Cari bagian yang terlihat seperti tahun (4 digit)
+    let yearIndex = -1;
+    parts.forEach((p, i) => {
+        if (/^\d{4}$/.test(p)) yearIndex = i;
+    });
 
-    if (dayPart && monthPart && yearPart) {
-        const day = parseInt(dayPart, 10);
-        const month = monthMap[monthPart];
-        const year = parseInt(yearPart, 10);
-        const timeMatch = dateString.match(/(\d{2}):(\d{2}):(\d{2})/);
-        const hours = timeMatch ? parseInt(timeMatch[1], 10) : 0;
-        const minutes = timeMatch ? parseInt(timeMatch[2], 10) : 0;
-        const seconds = timeMatch ? parseInt(timeMatch[3], 10) : 0;
+    if (yearIndex !== -1 && parts.length >= 3) {
+        const p0 = parseInt(parts[0], 10);
+        const p1 = parseInt(parts[1], 10);
+        const p2 = parseInt(parts[2], 10);
+        
+        // Format YYYY-MM-DD
+        if (yearIndex === 0) {
+            return new Date(p0, p1 - 1, p2);
+        }
+        
+        // Format diakhiri Tahun (DD/MM/YYYY atau MM/DD/YYYY)
+        if (yearIndex === 2) {
+            const year = p2;
+            let day, month;
 
-        const constructedDate = new Date(year, month, day, hours, minutes, seconds);
-        if (!isNaN(constructedDate.getTime())) {
-            return constructedDate;
+            // Heuristik: Jika angka pertama > 12, pasti itu Tanggal (DD/MM/YYYY)
+            if (p0 > 12) {
+                day = p0;
+                month = p1 - 1;
+            } 
+            // Heuristik: Jika angka kedua > 12, pasti itu Tanggal (MM/DD/YYYY)
+            else if (p1 > 12) {
+                month = p0 - 1;
+                day = p1;
+            }
+            // Jika ambigu (misal 5/6/2024), default ke format Indonesia (DD/MM/YYYY)
+            else {
+                day = p0;
+                month = p1 - 1;
+            }
+            
+            // Cek waktu jika ada
+            const timeMatch = cleanedString.match(/(\d{1,2}):(\d{2}):?(\d{2})?/);
+            let hours = 0, minutes = 0, seconds = 0;
+            if (timeMatch) {
+                hours = parseInt(timeMatch[1], 10);
+                minutes = parseInt(timeMatch[2], 10);
+                seconds = timeMatch[3] ? parseInt(timeMatch[3], 10) : 0;
+            }
+
+            const result = new Date(year, month, day, hours, minutes, seconds);
+            if (!isNaN(result.getTime())) return result;
         }
     }
 
-    // Attempt 3: Common formats like (DD/MM/YYYY or DD-MM-YYYY)
-    const datePartsMatch = dateString.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
-    if (datePartsMatch) {
-        // This regex captures DD, MM, YYYY separated by '/', '-', or '.'
-        const day = parseInt(datePartsMatch[1], 10);
-        const month = parseInt(datePartsMatch[2], 10) - 1; // JS months are 0-indexed
-        const year = parseInt(datePartsMatch[3], 10);
-        
-        const timeMatch = dateString.match(/(\d{2}):(\d{2}):(\d{2})/);
-        const hours = timeMatch ? parseInt(timeMatch[1], 10) : 0;
-        const minutes = timeMatch ? parseInt(timeMatch[2], 10) : 0;
-        const seconds = timeMatch ? parseInt(timeMatch[3], 10) : 0;
-        
-        if (month >= 0 && month < 12 && day > 0 && day <= 31) {
-            const euroDate = new Date(year, month, day, hours, minutes, seconds);
-            if (!isNaN(euroDate.getTime())) {
-                return euroDate;
+    // Attempt 3: Format teks Indonesia ("30 Juli 2024")
+    const monthMap: { [key: string]: number } = {
+        'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5,
+        'juli': 6, 'agustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'desember': 11,
+        'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
+        'jul': 6, 'aug': 7, 'agu': 7, 'sep': 8, 'oct': 9, 'okt': 9, 'nov': 10, 'dec': 11, 'des': 11
+    };
+    
+    const lowerStr = cleanedString.toLowerCase();
+    for (const [mName, mIdx] of Object.entries(monthMap)) {
+        if (lowerStr.includes(mName)) {
+            const dayMatch = lowerStr.match(/(\d{1,2})/);
+            const yearMatch = lowerStr.match(/(\d{4})/);
+            if (dayMatch && yearMatch) {
+                return new Date(parseInt(yearMatch[1]), mIdx, parseInt(dayMatch[1]));
             }
         }
     }
-    
+
     console.warn(`Gagal mem-parsing tanggal: "${dateString}"`);
     return null;
 };
@@ -134,9 +163,12 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
 
 
   useEffect(() => {
+    // Fungsi untuk membuat URL unik agar tidak di-cache (cache busting)
+    const getNoCacheUrl = (url: string) => `${url}&t=${Date.now()}`;
+
     const fetchLatestAnnouncement = async () => {
         try {
-            const response = await fetch(PENGUMUMAN_SPREADSHEET_URL);
+            const response = await fetch(getNoCacheUrl(PENGUMUMAN_SPREADSHEET_URL));
             if (!response.ok) throw new Error('Gagal memuat data pengumuman.');
             
             const csvText = await response.text();
@@ -165,7 +197,7 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
     const fetchMonthlyAttendance = async () => {
         setIsAttendanceLoading(true);
         try {
-            const response = await fetch(ATTENDANCE_URL);
+            const response = await fetch(getNoCacheUrl(ATTENDANCE_URL));
             if (!response.ok) throw new Error('Gagal memuat data absensi.');
             
             const csvText = await response.text();
@@ -179,9 +211,13 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
                 if (row.trim() === '') continue;
                 const columns = parseCsvRow(row);
                 if (!columns || columns.length === 0) continue;
-                const timestamp = columns[0]; // Kolom pertama adalah timestamp
-                if (timestamp) {
-                    const recordDate = parseDateFromString(timestamp);
+                
+                // Coba parsing kolom pertama (biasanya timestamp Google Form)
+                // Atau kolom waktuDatang jika menggunakan script custom
+                const dateString = columns[0]; // Kolom pertama (Timestamp)
+                
+                if (dateString) {
+                    const recordDate = parseDateFromString(dateString);
                     if (recordDate) {
                         if (recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear) {
                             count++;
@@ -201,7 +237,7 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
     const fetchYearlyDisasterReports = async () => {
         setIsDisasterLoading(true);
         try {
-            const response = await fetch(DISASTER_REPORT_URL);
+            const response = await fetch(getNoCacheUrl(DISASTER_REPORT_URL));
             if (!response.ok) throw new Error('Gagal memuat laporan bencana.');
             
             const csvText = await response.text();
@@ -235,7 +271,7 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
     const fetchYearlyActivityReports = async () => {
         setIsActivityLoading(true);
         try {
-            const response = await fetch(ACTIVITY_REPORT_URL);
+            const response = await fetch(getNoCacheUrl(ACTIVITY_REPORT_URL));
             if (!response.ok) throw new Error('Gagal memuat laporan kegiatan.');
             
             const csvText = await response.text();
